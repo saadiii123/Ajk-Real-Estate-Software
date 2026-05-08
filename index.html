@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AJK Real Estate — Property Management</title>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+  <!-- Stylesheets (order matters) -->
+  <link rel="stylesheet" href="assets/css/base.css">
+  <link rel="stylesheet" href="assets/css/layout.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/css/pages.css">
+  <!-- Restore theme BEFORE first paint — prevents flash of wrong theme -->
+  <script>
+    (function(){
+      var t = localStorage.getItem('ajk_theme') || 'dark';
+      if (t !== 'dark') document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
+</head>
+<body>
+
+<!-- ============================================================
+     LOGIN OVERLAY
+     ============================================================ -->
+<div id="login-overlay">
+  <div class="login-box">
+    <div class="login-logo">
+      <svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V21H15v-5h-6v5H3V9.5z"/></svg>
+    </div>
+    <h2>AJK Real Estate</h2>
+    <p>Azad Jammu &amp; Kashmir — Property Management</p>
+    <div class="login-field">
+      <label>Username</label>
+      <input type="text" id="login-user" placeholder="admin" autocomplete="username">
+    </div>
+    <div class="login-field">
+      <label>Password</label>
+      <input type="password" id="login-pass" placeholder="••••••••" autocomplete="current-password"
+             onkeydown="if(event.key==='Enter') doLogin()">
+    </div>
+    <button class="login-btn" onclick="doLogin()">Sign In →</button>
+    <div class="login-error" id="login-error">❌ Incorrect credentials. Try again.</div>
+    <div class="login-hint">Default: admin / ajk2025</div>
+  </div>
+</div>
+
+<!-- ============================================================
+     TOP NAVIGATION BAR
+     ============================================================ -->
+<div class="topbar">
+  <div class="brand">
+    <div class="logo">
+      <svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V21H15v-5h-6v5H3V9.5z"/></svg>
+    </div>
+    <div class="brand-text">
+      <h1>AJK Real Estate</h1>
+      <p>Azad Jammu &amp; Kashmir</p>
+    </div>
+  </div>
+  <div class="nav">
+    <button class="nav-btn"        onclick="showPage('dashboard')">    <span class="nav-icon">📊</span><span class="nav-label">Dashboard</span></button>
+    <button class="nav-btn active" onclick="showPage('register')">     <span class="nav-icon">➕</span><span class="nav-label">Register</span></button>
+    <button class="nav-btn"        onclick="showPage('listings')">     <span class="nav-icon">🏘</span><span class="nav-label">Listings</span></button>
+    <button class="nav-btn"        onclick="showPage('search')">       <span class="nav-icon">🔍</span><span class="nav-label">Search</span></button>
+    <button class="nav-btn"        onclick="showPage('match')">        <span class="nav-icon">🎯</span><span class="nav-label">Match</span></button>
+    <button class="nav-btn"        onclick="showPage('appointments')"> <span class="nav-icon">📅</span><span class="nav-label">Appts</span></button>
+    <button class="nav-btn"        onclick="showPage('calculator')">   <span class="nav-icon">💰</span><span class="nav-label">Calc</span></button>
+    <button class="nav-btn"        onclick="showPage('leads')">        <span class="nav-icon">👤</span><span class="nav-label">Leads</span></button>
+    <button class="nav-btn"        onclick="showPage('compare')">      <span class="nav-icon">⚖</span><span class="nav-label">Compare</span></button>
+    <!-- ── Theme Switcher ── -->
+    <div class="theme-switcher" id="theme-switcher">
+      <button class="theme-trigger" onclick="toggleThemePanel()" id="theme-trigger-btn">
+        <span class="theme-trigger-icon" id="theme-trigger-icon">🌙</span>
+        <span id="theme-trigger-label">Dark Mode</span>
+        <span class="theme-trigger-caret">▼</span>
+      </button>
+      <div class="theme-panel" id="theme-panel">
+        <div class="theme-panel-label">Choose Theme</div>
+        <button class="theme-option selected" data-mode="dark" onclick="setTheme('dark')">
+          <div class="t-icon">🌙</div>
+          <div class="t-info"><span class="t-name">Dark Mode</span><span class="t-desc">Deep forest &amp; black</span></div>
+          <div class="t-check"></div>
+        </button>
+        <button class="theme-option" data-mode="normal" onclick="setTheme('normal')">
+          <div class="t-icon">🌿</div>
+          <div class="t-info"><span class="t-name">Normal Mode</span><span class="t-desc">Softer dark contrast</span></div>
+          <div class="t-check"></div>
+        </button>
+        <button class="theme-option" data-mode="light" onclick="setTheme('light')">
+          <div class="t-icon">☀️</div>
+          <div class="t-info"><span class="t-name">Light Mode</span><span class="t-desc">White &amp; cream surfaces</span></div>
+          <div class="t-check"></div>
+        </button>
+      </div>
+    </div>
+    <button class="logout-btn" onclick="doLogout()">Logout</button>
+  </div>
+</div>
+
+<!-- ============================================================
+     HERO + STATS
+     ============================================================ -->
+<div class="hero">
+  <div class="hero-inner">
+    <div>
+      <div class="hero-badge">🏔 AJK Property Registry</div>
+      <div class="hero-title">Premium Property<br>Management System</div>
+      <div class="hero-sub">Azad Kashmir's trusted platform for buying, selling &amp; renting</div>
+    </div>
+  </div>
+</div>
+
+<div class="stats-row">
+  <div class="stat" onclick="showPage('listings')" title="View all properties">
+    <div class="stat-icon">🏠</div><div class="stat-label">Total Properties</div><div class="stat-val" id="s-total">0</div><div class="stat-sub">Click to view all ›</div>
+  </div>
+  <div class="stat" onclick="statFilter('sale')" title="View for-sale listings">
+    <div class="stat-icon">🏷</div><div class="stat-label">For Sale</div><div class="stat-val" id="s-sale">0</div><div class="stat-sub">Click to filter ›</div>
+  </div>
+  <div class="stat" onclick="statFilter('rent')" title="View for-rent listings">
+    <div class="stat-icon">🔑</div><div class="stat-label">For Rent</div><div class="stat-val" id="s-rent">0</div><div class="stat-sub">Click to filter ›</div>
+  </div>
+  <div class="stat" onclick="showPage('dashboard')" title="Open dashboard">
+    <div class="stat-icon">📍</div><div class="stat-label">Cities</div><div class="stat-val" id="s-cities">0</div><div class="stat-sub">Click for analytics ›</div>
+  </div>
+</div>
+
+<!-- ============================================================
+     MAIN CONTENT AREA
+     ============================================================ -->
+<div class="container">
+
+  <!-- ── DASHBOARD ── -->
+  <div class="page" id="page-dashboard">
+    <div class="page-header">
+      <div>
+        <div class="page-title">Dashboard</div>
+        <div class="page-sub">Analytics &amp; overview of your property portfolio</div>
+      </div>
+      <button class="btn btn-ghost" style="font-size:12px" onclick="exportCSV()">⬇ Export CSV</button>
+    </div>
+
+    <div id="dash-stats-row" style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:1.25rem"></div>
+
+    <div class="chart-grid">
+      <div class="chart-card"><h3>📊 Properties by Type</h3><div class="chart-wrap"><canvas id="chart-type"></canvas></div><div class="legend" id="legend-type"></div></div>
+      <div class="chart-card"><h3>🎯 Sale vs Rent</h3>        <div class="chart-wrap"><canvas id="chart-purpose"></canvas></div><div class="legend" id="legend-purpose"></div></div>
+      <div class="chart-card"><h3>📍 Properties by City</h3>  <div class="chart-wrap"><canvas id="chart-city"></canvas></div></div>
+      <div class="chart-card"><h3>✅ Status Overview</h3>      <div class="chart-wrap"><canvas id="chart-status"></canvas></div><div class="legend" id="legend-status"></div></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">🕒 Recent Registrations</div>
+      <div id="recent-list"></div>
+    </div>
+  </div><!-- /dashboard -->
+
+  <!-- ── REGISTER ── -->
+  <div class="page active" id="page-register">
+    <div id="reg-success" class="success-bar"></div>
+    <div id="reg-error"   class="error-bar"></div>
+
+    <!-- Step 1: Purpose & Type -->
+    <div class="card">
+      <div class="card-title"><span class="step-badge">1</span> Listing Purpose</div>
+      <div class="purpose-row">
+        <div class="purpose-card sel" id="pc-sale" onclick="selectPurpose('sale')">
+          <div class="pc-icon">🏷</div><div class="pc-title">For Sale</div><div class="pc-sub">One-time ownership transfer</div>
+        </div>
+        <div class="purpose-card"     id="pc-rent" onclick="selectPurpose('rent')">
+          <div class="pc-icon">🔑</div><div class="pc-title">For Rent</div><div class="pc-sub">Monthly / yearly rental</div>
+        </div>
+      </div>
+      <div class="divider"></div>
+      <div class="card-title" style="margin-top:0;border-bottom:none;padding-bottom:0">
+        <span class="step-badge" style="background:var(--text3)">—</span> Property Type
+      </div>
+      <div class="type-pills" style="margin-top:10px">
+        <button class="pill sel" onclick="toggleType(this,'Residential')">🏠 Residential</button>
+        <button class="pill"     onclick="toggleType(this,'Commercial')">🏢 Commercial</button>
+        <button class="pill"     onclick="toggleType(this,'Agricultural')">🌾 Agricultural</button>
+        <button class="pill"     onclick="toggleType(this,'Plot / Land')">🗺 Plot / Land</button>
+      </div>
+    </div>
+
+    <!-- Step 2: Owner Type -->
+    <div class="card">
+      <div class="card-title"><span class="step-badge">2</span> Owner / Seller Type <span class="req">*</span></div>
+      <div class="type-grid">
+        <div class="type-box" id="box-agent"  onclick="selectOwnerType('agent')">
+          <div class="cb"><svg class="cb-check" viewBox="0 0 12 12" fill="none"><polyline points="1,6 4.5,9.5 11,2.5" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+          <div class="tb-icon" style="background:rgba(100,80,200,0.15)">👤</div>
+          <div class="tb-label">Agent</div><div class="tb-sub">Licensed broker or agency rep</div>
+        </div>
+        <div class="type-box" id="box-owner"  onclick="selectOwnerType('owner')">
+          <div class="cb"><svg class="cb-check" viewBox="0 0 12 12" fill="none"><polyline points="1,6 4.5,9.5 11,2.5" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+          <div class="tb-icon" style="background:rgba(22,105,78,0.15)">🏡</div>
+          <div class="tb-label">Direct Owner</div><div class="tb-sub">Individual property owner</div>
+        </div>
+        <div class="type-box" id="box-vendor" onclick="selectOwnerType('vendor')">
+          <div class="cb"><svg class="cb-check" viewBox="0 0 12 12" fill="none"><polyline points="1,6 4.5,9.5 11,2.5" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+          <div class="tb-icon" style="background:rgba(201,168,76,0.12)">🏗</div>
+          <div class="tb-label">Vendor / Builder</div><div class="tb-sub">Company or developer</div>
+        </div>
+      </div>
+      <div id="owner-form-wrap" style="margin-top:1rem"></div>
+    </div>
+
+    <!-- Step 3: Property Details -->
+    <div class="card">
+      <div class="card-title"><span class="step-badge">3</span> Property Details</div>
+      <div class="form-grid">
+        <div class="fg full"><label>Property Title <span class="req">*</span></label><input id="f-title" placeholder="e.g. 5 Marla House in Rawalakot City"></div>
+        <div class="fg">
+          <label>City <span class="req">*</span></label>
+          <select id="f-city" onchange="updateLocalityDropdown()">
+            <option value="">— Select City —</option>
+            <option>Muzaffarabad</option><option>Rawalakot</option><option>Mirpur</option>
+            <option>Bagh</option><option>Kotli</option><option>Bhimber</option>
+            <option>Haveli</option><option>Sudhnoti</option><option>Neelum Valley</option>
+            <option>Hattian Bala</option><option>Chakothi</option><option>Athmuqam</option>
+            <option>Pallandri</option><option>Hajira</option><option>Barnala</option>
+          </select>
+        </div>
+        <div class="fg"><label>Area / Locality</label><select id="f-locality"><option value="">— Select Locality —</option></select></div>
+        <div class="fg"><label>Size</label><input id="f-size" placeholder="e.g. 5 Marla, 10 Kanal"></div>
+        <div class="fg"><label>Price (PKR) <span class="req">*</span></label><input id="f-price" type="number" placeholder="e.g. 5000000" oninput="updatePricePreview()"></div>
+        <div class="fg"><label>Bedrooms</label><input id="f-beds" placeholder="e.g. 3"></div>
+        <div class="fg"><label>Bathrooms</label><input id="f-baths" placeholder="e.g. 2"></div>
+        <div class="fg">
+          <label>Condition</label>
+          <select id="f-condition">
+            <option value="">— Select —</option>
+            <option>Brand New</option><option>Good</option><option>Fair</option><option>Needs Renovation</option>
+          </select>
+        </div>
+        <div class="fg full"><label>Description</label><textarea id="f-desc" placeholder="Describe the property, features, nearby landmarks..."></textarea></div>
+      </div>
+      <div id="price-preview" style="font-size:16px;color:var(--gold);margin-top:6px;font-family:'Cormorant Garamond',serif"></div>
+    </div>
+
+    <!-- Step 4: Status -->
+    <div class="card">
+      <div class="card-title"><span class="step-badge">4</span> Listing Status</div>
+      <div class="status-pills">
+        <button class="status-pill active-avail" id="sp-available" onclick="selectStatus('Available')">✅ Available</button>
+        <button class="status-pill"              id="sp-reserved"  onclick="selectStatus('Reserved')">🔒 Reserved</button>
+        <button class="status-pill"              id="sp-sold"      onclick="selectStatus('Sold')">🏷 Sold</button>
+        <button class="status-pill"              id="sp-rented"    onclick="selectStatus('Rented')">🔑 Rented</button>
+      </div>
+      <input type="hidden" id="f-status" value="Available">
+    </div>
+
+    <!-- Step 5: Images -->
+    <div class="card">
+      <div class="card-title"><span class="step-badge">5</span> Property Images</div>
+      <div class="img-list" id="image-preview-list"></div>
+      <div class="img-input-wrap" style="margin-top:10px">
+        <input id="img-url-input" placeholder="Paste image URL here (https://...jpg)" onkeydown="if(event.key==='Enter') addImageUrl()">
+        <button class="btn btn-ghost" style="padding:9px 16px;font-size:12.5px" onclick="addImageUrl()">+ Add</button>
+      </div>
+      <input type="hidden" id="f-images" value="[]">
+      <div class="info-note">Tip: Add multiple image URLs. First image will be the main thumbnail.</div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-ghost"   onclick="clearRegForm()">🗑 Clear Form</button>
+      <button class="btn btn-primary" id="save-btn" onclick="registerProperty()">💾 Register Property</button>
+    </div>
+  </div><!-- /register -->
+
+  <!-- ── LISTINGS ── -->
+  <div class="page" id="page-listings">
+    <div class="page-header">
+      <div>
+        <div class="page-title">All Listings</div>
+        <div class="page-sub" id="listings-count"></div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <select class="filter-select" id="lst-status-filter"  onchange="renderListings()"><option value="">All Status</option><option>Available</option><option>Reserved</option><option>Sold</option><option>Rented</option></select>
+        <select class="filter-select" id="lst-purpose-filter" onchange="renderListings()"><option value="">All Purpose</option><option value="sale">For Sale</option><option value="rent">For Rent</option></select>
+        <select class="filter-select" id="lst-type-filter" onchange="renderListings()">
+        <option value="">All Types</option><option>Residential</option><option>Commercial</option><option>Agricultural</option><option>Plot / Land</option>
+      </select>
+      <select class="filter-select" id="lst-sort" onchange="renderListings()">
+        <option value="newest">Newest First</option><option value="oldest">Oldest First</option>
+        <option value="price_hi">Price: High→Low</option><option value="price_lo">Price: Low→High</option>
+        <option value="views">Most Viewed</option>
+      </select>
+      <button class="btn btn-ghost" style="font-size:12px;padding:7px 14px" onclick="exportCSV()">⬇ CSV</button>
+      </div>
+    </div>
+    <div class="prop-grid" id="listings-container">
+      <div class="empty-state"><div class="empty-icon">🏚</div>No properties registered yet.</div>
+    </div>
+  </div><!-- /listings -->
+
+  <!-- ── SEARCH ── -->
+  <div class="page" id="page-search">
+    <div class="page-header">
+      <div><div class="page-title">Search Properties</div><div class="page-sub">Filter and find properties across AJK</div></div>
+    </div>
+    <div class="card">
+      <div class="search-bar">
+        <input id="search-input" placeholder="🔍 Search by title, city, owner name..." onkeydown="if(event.key==='Enter') runSearch()">
+        <button class="btn btn-primary" onclick="runSearch()">Search</button>
+      </div>
+      <div class="filter-row">
+        <select class="filter-select" id="f-type-filter">    <option value="">All Types</option><option>Residential</option><option>Commercial</option><option>Agricultural</option><option>Plot / Land</option></select>
+        <select class="filter-select" id="f-purpose-filter"> <option value="">Sale &amp; Rent</option><option value="sale">For Sale</option><option value="rent">For Rent</option></select>
+        <select class="filter-select" id="f-city-filter">
+          <option value="">All Cities</option><option>Muzaffarabad</option><option>Rawalakot</option><option>Mirpur</option>
+          <option>Bagh</option><option>Kotli</option><option>Bhimber</option><option>Haveli</option><option>Neelum Valley</option>
+        </select>
+        <select class="filter-select" id="f-ownertype-filter"><option value="">All Owner Types</option><option value="agent">Agent</option><option value="owner">Owner</option><option value="vendor">Vendor</option></select>
+        <select class="filter-select" id="f-status-filter">  <option value="">All Status</option><option>Available</option><option>Reserved</option><option>Sold</option><option>Rented</option></select>
+        <input class="filter-select" id="f-minprice"         type="number" placeholder="Min Price"  style="width:110px">
+        <input class="filter-select" id="f-maxprice-custom"  type="number" placeholder="Max Price"  style="width:110px">
+      </div>
+    </div>
+    <div id="search-results"></div>
+  </div><!-- /search -->
+
+  <!-- ── BUYER MATCH ── -->
+  <div class="page" id="page-match">
+    <div class="page-header">
+      <div><div class="page-title">Buyer Match</div><div class="page-sub">Match a buyer's requirements to available properties</div></div>
+    </div>
+    <div class="card">
+      <div class="form-grid">
+        <div class="fg"><label>Buyer Name</label>    <input id="b-name"   placeholder="e.g. Ali Khan"></div>
+        <div class="fg"><label>Buyer Phone</label>   <input id="b-phone"  placeholder="e.g. 0300-1234567"></div>
+        <div class="fg"><label>Purpose</label>       <select id="b-purpose"><option value="">Any</option><option value="sale">Buy (Sale)</option><option value="rent">Rent</option></select></div>
+        <div class="fg"><label>Property Type</label> <select id="b-type">  <option value="">Any</option><option>Residential</option><option>Commercial</option><option>Agricultural</option><option>Plot / Land</option></select></div>
+        <div class="fg"><label>Preferred City</label><select id="b-city">  <option value="">Any City</option><option>Muzaffarabad</option><option>Rawalakot</option><option>Mirpur</option><option>Bagh</option><option>Kotli</option><option>Bhimber</option><option>Haveli</option><option>Neelum Valley</option></select></div>
+        <div class="fg"><label>Max Budget (PKR)</label><input id="b-budget" type="number" placeholder="e.g. 10000000"></div>
+        <div class="fg"><label>Min Bedrooms</label>  <input id="b-beds"   type="number" placeholder="e.g. 3"></div>
+      </div>
+      <div class="btn-row"><button class="btn btn-primary" onclick="findMatches()">🎯 Find Matches</button></div>
+    </div>
+    <div id="match-results"></div>
+  </div><!-- /match -->
+
+  <!-- ── APPOINTMENTS ── -->
+  <div class="page" id="page-appointments">
+    <div class="page-header">
+      <div><div class="page-title">Appointments</div><div class="page-sub">Schedule and manage property visits</div></div>
+      <button class="btn btn-primary" onclick="toggleApptForm()">+ New Appointment</button>
+    </div>
+    <div class="card" id="appt-form-wrap" style="display:none">
+      <div class="card-title">📅 Schedule a Visit</div>
+      <div class="form-grid">
+        <div class="fg"><label>Visitor Name <span class="req">*</span></label><input id="ap-name"  placeholder="e.g. Muhammad Tariq"></div>
+        <div class="fg"><label>Phone</label>                                  <input id="ap-phone" placeholder="e.g. 0345-1234567"></div>
+        <div class="fg"><label>Property Title / Ref</label>                   <input id="ap-prop"  placeholder="e.g. House in Rawalakot"></div>
+        <div class="fg"><label>Date <span class="req">*</span></label>         <input id="ap-date" type="date"></div>
+        <div class="fg"><label>Time</label>                                   <input id="ap-time" type="time" value="10:00"></div>
+        <div class="fg"><label>Status</label>
+          <select id="ap-status"><option>Pending</option><option>Confirmed</option><option>Done</option><option>Cancelled</option></select>
+        </div>
+        <div class="fg full"><label>Notes</label><textarea id="ap-notes" placeholder="Any special instructions..."></textarea></div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-ghost"   onclick="toggleApptForm()">Cancel</button>
+        <button class="btn btn-primary" onclick="saveAppointment()">Save Appointment</button>
+      </div>
+    </div>
+    <div id="appointments-list">
+      <div class="empty-state"><div class="empty-icon">📅</div>No appointments scheduled yet.</div>
+    </div>
+  </div><!-- /appointments -->
+
+  <!-- ── CALCULATOR ── -->
+  <div class="page" id="page-calculator">
+    <div class="page-header">
+      <div><div class="page-title">Installment Calculator</div><div class="page-sub">Calculate payment plans for property purchase</div></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px" class="calc-grid">
+      <div class="card">
+        <div class="card-title">💰 Enter Details</div>
+        <div style="display:flex;flex-direction:column;gap:13px">
+          <div class="fg"><label>Total Property Price (PKR) <span class="req">*</span></label><input id="calc-price" type="number" placeholder="e.g. 5000000" oninput="calcInstallment()"></div>
+          <div class="fg"><label>Down Payment (PKR)</label>   <input id="calc-down"  type="number" placeholder="e.g. 1000000"  oninput="calcInstallment()"></div>
+          <div class="fg">
+            <label>Loan Duration (Years)</label>
+            <select id="calc-years" onchange="calcInstallment()">
+              <option value="1">1 Year</option><option value="2">2 Years</option><option value="3">3 Years</option>
+              <option value="5" selected>5 Years</option><option value="7">7 Years</option>
+              <option value="10">10 Years</option><option value="15">15 Years</option><option value="20">20 Years</option>
+            </select>
+          </div>
+          <div class="fg"><label>Annual Interest Rate (%)</label><input id="calc-rate" type="number" placeholder="e.g. 12" value="12" oninput="calcInstallment()"></div>
+          <div class="fg">
+            <label>Payment Frequency</label>
+            <select id="calc-freq" onchange="calcInstallment()">
+              <option value="12">Monthly</option><option value="4">Quarterly</option>
+              <option value="2">Bi-Annually</option><option value="1">Annually</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div id="calc-output" class="card" style="display:none">
+          <div class="card-title">📋 Payment Plan</div>
+          <div class="calc-result">
+            <h3>Summary</h3>
+            <div class="calc-row"><span>Property Price</span> <strong id="co-price">—</strong></div>
+            <div class="calc-row"><span>Down Payment</span>   <strong id="co-down">—</strong></div>
+            <div class="calc-row"><span>Loan Amount</span>    <strong id="co-loan">—</strong></div>
+            <div class="calc-row"><span>Total Interest</span> <strong id="co-interest">—</strong></div>
+            <div class="calc-row"><span>Total Payable</span>  <strong id="co-total">—</strong></div>
+          </div>
+          <div class="calc-highlight" style="margin-top:1rem">
+            <div>
+              <div class="label">Per Installment Amount</div>
+              <div style="font-size:11px;color:var(--text3)" id="co-freq-label">Monthly</div>
+            </div>
+            <div class="value" id="co-installment">—</div>
+          </div>
+          <div class="calc-highlight" style="margin-top:8px">
+            <div><div class="label">Total Installments</div></div>
+            <div class="value" id="co-count">—</div>
+          </div>
+        </div>
+        <div id="calc-placeholder" class="card" style="text-align:center;padding:3rem 1rem">
+          <div style="font-size:40px;margin-bottom:10px">💰</div>
+          <div style="color:var(--text3);font-size:13px">Enter property price to see the payment plan</div>
+        </div>
+      </div>
+    </div>
+  </div><!-- /calculator -->
+
+</div><!-- /container -->
+
+
+<!-- ═══════════════════ LEADS ════════════════════════════════ -->
+<div class="page" id="page-leads">
+  <div class="page-header">
+    <div><div class="page-title">Buyer Leads</div><div class="page-sub" id="leads-count">0 leads</div></div>
+    <button class="btn btn-primary" onclick="toggleLeadForm()">+ Add Lead</button>
+  </div>
+  <div class="card" id="lead-form-wrap" style="display:none">
+    <div class="card-title">👤 New Buyer Enquiry</div>
+    <div class="form-grid">
+      <div class="fg"><label>Name <span class="req">*</span></label><input id="ld-name" placeholder="Buyer full name"></div>
+      <div class="fg"><label>Phone <span class="req">*</span></label><input id="ld-phone" placeholder="0300-0000000"></div>
+      <div class="fg"><label>Email</label><input id="ld-email" type="email" placeholder="email@example.com"></div>
+      <div class="fg"><label>Preferred City</label>
+        <select id="ld-city"><option value="">Any City</option><option>Muzaffarabad</option><option>Rawalakot</option><option>Mirpur</option><option>Bagh</option><option>Kotli</option><option>Bhimber</option><option>Haveli</option><option>Neelum Valley</option></select>
+      </div>
+      <div class="fg"><label>Property Type</label><select id="ld-type"><option value="">Any</option><option>Residential</option><option>Commercial</option><option>Agricultural</option><option>Plot / Land</option></select></div>
+      <div class="fg"><label>Purpose</label><select id="ld-purpose"><option value="">Any</option><option value="sale">Buying</option><option value="rent">Renting</option></select></div>
+      <div class="fg"><label>Max Budget (PKR)</label><input id="ld-budget" type="number" placeholder="e.g. 5000000"></div>
+      <div class="fg"><label>Initial Status</label><select id="ld-status"><option>New</option><option>Called</option><option>Visited</option><option>Closed</option><option>Lost</option></select></div>
+      <div class="fg full"><label>Property Interest</label><input id="ld-prop-ref" placeholder="Specific property or requirements..."></div>
+      <div class="fg full"><label>Notes / Message</label><textarea id="ld-message" placeholder="Buyer requirements, budget notes..."></textarea></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-ghost" onclick="toggleLeadForm()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveLead()">💾 Save Lead</button>
+    </div>
+  </div>
+  <div class="card" style="margin-bottom:1rem">
+    <div class="card-title">📊 Pipeline View</div>
+    <div class="pipeline-wrap"><div class="pipeline" id="leads-pipeline"></div></div>
+  </div>
+  <div class="page-header" style="margin-top:1rem">
+    <div style="font-size:13px;color:var(--text3)">All Leads</div>
+    <select class="filter-select" id="ld-status-filter" onchange="renderLeads()">
+      <option value="">All Status</option><option>New</option><option>Called</option><option>Visited</option><option>Closed</option><option>Lost</option>
+    </select>
+  </div>
+  <div id="leads-list"><div class="empty-state"><div class="empty-icon">👤</div>No leads yet.</div></div>
+</div>
+
+<!-- ═══════════════════ COMPARE ══════════════════════════════ -->
+<div class="page" id="page-compare">
+  <div class="page-header">
+    <div><div class="page-title">Property Comparison</div><div class="page-sub">Compare two properties side by side</div></div>
+    <button class="btn btn-ghost" style="font-size:12px" onclick="clearCompare();showPage('listings')">← Back to Listings</button>
+  </div>
+  <div class="info-note" style="margin-bottom:1rem">Go to <strong>Listings</strong> and click <strong>⚖ Compare</strong> on any two properties, then return here.</div>
+  <div id="compare-content">
+    <div class="empty-state"><div class="empty-icon">⚖</div>Select 2 properties from Listings to compare them here.</div>
+  </div>
+</div>
+
+<!-- Compare floating bar -->
+<div id="compare-bar" style="position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--forest-mid);border:1px solid var(--forest-light);border-radius:99px;padding:10px 20px;display:none;align-items:center;gap:14px;z-index:200;box-shadow:0 4px 20px rgba(0,0,0,0.5)">
+  <span id="compare-count" style="font-size:13px;color:var(--gold-light);font-weight:500">0 selected</span>
+  <button class="btn btn-ghost" style="font-size:12px;padding:6px 14px" onclick="showPage('compare')">⚖ Compare Now</button>
+  <button class="btn btn-danger" style="font-size:12px;padding:6px 12px" onclick="clearCompare()">✕ Clear</button>
+</div>
+
+<!-- ============================================================
+     GALLERY MODAL
+     ============================================================ -->
+<div class="gallery-modal" id="gallery-modal">
+  <button class="gallery-modal-close" onclick="closeGallery()">✕</button>
+  <img id="gallery-modal-img" src="" alt="Property Image">
+</div>
+
+<!-- ============================================================
+     SCRIPTS  (load order matters)
+     ============================================================ -->
+<!-- Vendor -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+
+<!-- App modules -->
+<script src="assets/js/app.js"></script>
+<script src="assets/js/auth.js"></script>
+<script src="assets/js/navigation.js"></script>
+<script src="assets/js/register.js"></script>
+<script src="assets/js/listings.js"></script>
+<script src="assets/js/charts.js"></script>
+<script src="assets/js/features.js"></script>
+<script src="assets/js/print.js"></script>
+
+</body>
+</html>

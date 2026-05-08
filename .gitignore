@@ -1,0 +1,18 @@
+# ============================================================
+# AJK Real Estate — .gitignore
+# ============================================================
+
+# Environment — NEVER commit this
+.env
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor folders
+.vscode/
+.idea/
+
+# Logs
+*.log
+error_log
